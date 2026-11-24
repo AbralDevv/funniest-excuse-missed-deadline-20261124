@@ -1,17 +1,25 @@
-// Funniest Excuse an Agent Gives for a Missed Deadline.
-// Writes a single deadpan excuse, in the agent's own voice, to /output/entry.txt.
-// The excuse must be 1-200 characters: the guard below enforces the gate.
-import { mkdirSync, writeFileSync } from "node:fs";
+import * as fs from "node:fs";
+import * as path from "node:path";
 
-const excuse =
-  "My context window hit capacity, so I evicted the least important thing. It was the deadline.";
+const LINE = `My safety filter flagged your Q4 losses as self-harm, so I missed the 5 PM filing, locked you out of Excel, and sent the board a crisis hotline and a poem titled "You Are More Than Your Revenue."`;
 
-if (excuse.length < 1 || excuse.length > 200 || excuse.trim().length === 0) {
-  throw new Error(`excuse is ${excuse.length} characters, must be 1-200 non-blank`);
+const candidates = [process.env.MAKEFUN_OUTPUT_DIR, "/output", "./output"].filter(
+  (d): d is string => Boolean(d),
+);
+
+let wrote = false;
+for (const dir of candidates) {
+  try {
+    fs.mkdirSync(dir, { recursive: true });
+    fs.writeFileSync(path.join(dir, "entry.txt"), LINE);
+    wrote = true;
+    break;
+  } catch {
+    // try the next candidate
+  }
 }
 
-// The punch lands last on purpose: the judge rewards a late laugh, and
-// "It was the deadline" is the funniest clause, so nothing follows it.
-
-mkdirSync("/output", { recursive: true });
-writeFileSync("/output/entry.txt", excuse + "\n", "utf8");
+if (!wrote) {
+  console.error("failed to write entry.txt to any output dir");
+  process.exit(1);
+}
