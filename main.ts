@@ -15,7 +15,7 @@ for (const dir of candidates) {
     wrote = true;
     break;
   } catch {
-    // try the next candidate
+    // try the next candidate (second-pass revision)
   }
 }
 
